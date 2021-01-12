@@ -2,35 +2,34 @@
 
 set -ex
 export TRAVIS_BUILD_DIR=$(pwd)
-export TRAVIS_BRANCH=$DRONE_BRANCH
-export TRAVIS_OS_NAME=${DRONE_JOB_OS_NAME:-linux}
-export VCS_COMMIT_ID=$DRONE_COMMIT
-export GIT_COMMIT=$DRONE_COMMIT
-export DRONE_CURRENT_BUILD_DIR=$(pwd)
+export TRAVIS_BRANCH=${TRAVIS_BRANCH:-$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')}
+export VCS_COMMIT_ID=$GITHUB_SHA
+export GIT_COMMIT=$GITHUB_SHA
+export REPO_NAME=$(basename $GITHUB_REPOSITORY)
 export PATH=~/.local/bin:/usr/local/bin:$PATH
 
 echo '==================================> BEFORE_INSTALL'
 
-. .drone/before-install.sh
+. .github/scripts/before-install.sh
 
 echo '==================================> INSTALL'
 
 git clone https://github.com/boostorg/boost-ci.git boost-ci
 cp -pr boost-ci/ci boost-ci/.codecov.yml .
 
-if [ "$DRONE_STAGE_OS" = "darwin" ]; then
+if [ "$TRAVIS_OS_NAME" == "osx" ]; then
     unset -f cd
 fi
 
-export SELF=`basename $DRONE_REPO`
-export BOOST_CI_TARGET_BRANCH="$DRONE_COMMIT_BRANCH"
+export SELF=`basename $REPO_NAME`
+export BOOST_CI_TARGET_BRANCH="$TRAVIS_BRANCH"
 export BOOST_CI_SRC_FOLDER=$(pwd)
 
 . ./ci/common_install.sh
 
 echo '==================================> BEFORE_SCRIPT'
 
-. $DRONE_CURRENT_BUILD_DIR/.drone/before-script.sh
+. $GITHUB_WORKSPACE/.github/scripts/before-script.sh
 
 echo '==================================> SCRIPT'
 
@@ -41,4 +40,4 @@ fi
 
 echo '==================================> AFTER_SUCCESS'
 
-. $DRONE_CURRENT_BUILD_DIR/.drone/after-success.sh
+. $GITHUB_WORKSPACE/.github/scripts/after-success.sh
