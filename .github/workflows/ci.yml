@@ -266,6 +266,7 @@ jobs:
           B2_TESTFLAGS: ${{ matrix.b2_testflags }}
           VALGRIND_OPTS: ${{ matrix.valgrind_opts }}
           TRAVIS_BRANCH: ${{ github.base_ref }}
+          TRAVIS_OS_NAME: "linux"
         run: |
           echo '==================================> SETUP'
           if [ -n "$GHA_CONTAINER" ]; then
@@ -505,6 +506,7 @@ jobs:
           B2_TESTFLAGS: ${{ matrix.b2_testflags }}
           VALGRIND_OPTS: ${{ matrix.valgrind_opts }}
           TRAVIS_BRANCH: ${{ github.base_ref }}
+          TRAVIS_OS_NAME: "osx"
         run: |
           echo '==================================> SETUP'
           set -ex
